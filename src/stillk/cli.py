@@ -7,7 +7,7 @@ import typer
 from .core.models import ProjectConfig
 from .core.registry import PROJECT_TYPES, get_framework, get_project_type
 from .generator import ProjectGenerator
-from .tooling import (
+from .commands.tooling import (
     inspect_project,
     run_doctor,
     clean_project,
