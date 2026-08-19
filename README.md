@@ -39,6 +39,19 @@ stillk init meu-llm --project-type llm --framework transformers
 stillk init
 ```
 
+## AI Engineering Toolkit commands
+
+Stillk now includes runtime tooling to help during development, training and maintenance:
+
+- `stillk inspect` — analyze the current project for frameworks, models, datasets, Docker, GPU and give warnings.
+- `stillk doctor` — run quick environment checks (Python, pip, Docker, GPU, PyTorch/TensorFlow).
+- `stillk clean` — detect caches and temporary artifacts and optionally remove them (`--yes`).
+- `stillk train` — detect training scripts and (optionally) execute them (`--execute`).
+- `stillk eval` — run or detect evaluation pipelines and report metrics.
+- `stillk benchmark` — lightweight benchmarking scaffold for models and pipelines.
+- `stillk run <component>` — run project components such as `api`, `training`, `inference`.
+
+
 The interactive mode asks for:
 
 - project type
