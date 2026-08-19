@@ -100,7 +100,7 @@ def list_templates() -> None:
 
 
 @app.command()
-def inspect(path: str = typer.Option(".", help="Path to the project root.")) -> None:
+def inspect(path: str = typer.Argument(".", help="Path to the project root.")) -> None:
     """Inspect the current project and surface AI-related info and warnings."""
     info = inspect_project(path)
     typer.echo("Project inspection summary:")
@@ -116,7 +116,7 @@ def inspect(path: str = typer.Option(".", help="Path to the project root.")) -> 
 
 
 @app.command()
-def doctor(path: str = typer.Option(".", help="Path to check.")) -> None:
+def doctor(path: str = typer.Argument(".", help="Path to check.")) -> None:
     """Run quick environment checks and report OK/WARNING/ERROR."""
     results = run_doctor(path)
     for name, status in results:
@@ -129,7 +129,7 @@ def doctor(path: str = typer.Option(".", help="Path to check.")) -> None:
 
 
 @app.command()
-def clean(path: str = typer.Option(".", help="Project root path."), all: bool = typer.Option(False, "--all", help="Include all caches."), yes: bool = typer.Option(False, "--yes", help="Confirm deletion without prompting.")) -> None:
+def clean(path: str = typer.Argument(".", help="Project root path."), all: bool = typer.Option(False, "--all", help="Include all caches."), yes: bool = typer.Option(False, "--yes", help="Confirm deletion without prompting.")) -> None:
     """Detect and clean caches and temporary artifacts related to AI development."""
     info = clean_project(path, all=all, yes=yes)
     if info.get("dry_run"):
@@ -143,7 +143,7 @@ def clean(path: str = typer.Option(".", help="Project root path."), all: bool = 
 
 
 @app.command()
-def train(path: str = typer.Option(".", help="Project root path."), execute: bool = typer.Option(False, "--execute", help="Execute the detected training script."), epochs: int | None = typer.Option(None, "--epochs", help="Override epochs."), config: str | None = typer.Option(None, "--config", help="Configuration profile to use.")) -> None:
+def train(path: str = typer.Argument(".", help="Project root path."), execute: bool = typer.Option(False, "--execute", help="Execute the detected training script."), epochs: int | None = typer.Option(None, "--epochs", help="Override epochs."), config: str | None = typer.Option(None, "--config", help="Configuration profile to use.")) -> None:
     """Detect and run training pipelines."""
     extra = []
     if epochs is not None:
@@ -159,7 +159,7 @@ def train(path: str = typer.Option(".", help="Project root path."), execute: boo
 
 
 @app.command()
-def eval(path: str = typer.Option(".", help="Project root path.")) -> None:
+def eval(path: str = typer.Argument(".", help="Project root path.")) -> None:
     """Run evaluation pipelines and report metrics."""
     result = tooling_evaluate(path)
     if not result.get("found"):
@@ -171,14 +171,14 @@ def eval(path: str = typer.Option(".", help="Project root path.")) -> None:
 
 
 @app.command()
-def benchmark(path: str = typer.Option(".", help="Project root path.")) -> None:
+def benchmark(path: str = typer.Argument(".", help="Project root path.")) -> None:
     """Run lightweight benchmarks between models or configurations."""
     result = tooling_benchmark(path)
     typer.echo(f"Benchmark status: {result.get('status')}")
 
 
 @app.command()
-def run(component: str = typer.Argument(..., help="Component to run: api, training, inference."), path: str = typer.Option(".", help="Project root path.")) -> None:
+def run(component: str = typer.Argument(..., help="Component to run: api, training, inference."), path: str = typer.Argument(".", help="Project root path.")) -> None:
     """Run a specific project component (api, training, inference)."""
     result = run_component(path, component)
     if not result.get("found"):

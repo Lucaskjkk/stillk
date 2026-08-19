@@ -111,13 +111,6 @@ meu-projeto/
 - Transformers
 - LangGraph
 
-## Roadmap
-
-- v0.1: core init command and basic templates
-- v0.2: `stillk add` plugin system
-- v0.3: FastAPI, MLflow, Airflow, and monitoring integrations
-- v0.4: community templates and custom template registry
-
 ## Publishing to PyPI
 
 To build the package:
@@ -142,3 +135,5 @@ Contributions are welcome. Please open an issue or pull request with tests for n
 ## License
 
 MIT
+
+Copyright (c) 2026 Lucas Balduino - Stillk
