@@ -249,12 +249,12 @@ def train(path: Path | str = ".", execute: bool = False, extra_args: list[str] |
 
 def evaluate(path: Path | str = ".") -> dict:
     p = Path(path)
-    # look for eval scripts
-    candidates = list(p.rglob("eval*.py"))
+    # look for eval scripts with common patterns
+    candidates = list(p.rglob("eval*.py")) + list(p.rglob("evaluate*.py")) + list(p.rglob("evaluate_*.py")) + list(p.rglob("evaluate-*.py"))
     if candidates:
         return {"found": True, "script": str(candidates[0]), "metrics": {"accuracy": 0.0}}
-    # fallback: look for evals dir
-    if (p / "src" / "evals").exists():
+    # fallback: look for evals dir or common filenames
+    if (p / "src" / "evals").exists() or (p / "evals").exists() or (p / "evaluate.py").exists() or (p / "eval.py").exists():
         return {"found": True, "metrics": {"accuracy": 0.0}}
     return {"found": False}
 
@@ -267,11 +267,38 @@ def benchmark(path: Path | str = ".") -> dict:
 def run_component(path: Path | str = ".", component: str = "api") -> dict:
     p = Path(path)
     component = component.lower()
+    # If the component string points to an existing path relative to cwd or project root,
+    # treat it as a target path and try to infer what to run.
+    comp_path = Path(component)
+    if not comp_path.exists():
+        comp_path = p / component
+
+    if comp_path.exists():
+        # If it's a file, run that script
+        if comp_path.is_file():
+            return {"found": True, "script": str(comp_path), "status": "script"}
+        # If it's a directory, attempt to infer a component inside it
+        # Check for training scripts
+        train_script = detect_training_script(comp_path)
+        if train_script:
+            return {"found": True, "script": str(train_script), "status": "training"}
+        # Check for API main
+        main_candidates = list(comp_path.rglob("main.py"))
+        if main_candidates:
+            return {"found": True, "script": str(main_candidates[0]), "status": "api"}
+        # Check for inference/predict
+        preds = list(comp_path.rglob("predict*.py"))
+        if preds:
+            return {"found": True, "script": str(preds[0]), "status": "inference"}
+        # nothing detected inside the directory
+        return {"found": False}
+
+    # Otherwise treat component as a named role
     if component == "api":
         # look for uvicorn or fastapi app
         app_candidates = list(p.rglob("main.py"))
         if app_candidates:
-            return {"found": True, "script": str(app_candidates[0]), "status": "detected"}
+            return {"found": True, "script": str(app_candidates[0]), "status": "api"}
         return {"found": False}
     if component in {"training", "train"}:
         return train(path, execute=False)
@@ -279,6 +306,6 @@ def run_component(path: Path | str = ".", component: str = "api") -> dict:
         # detect predict.py
         preds = list(p.rglob("predict*.py"))
         if preds:
-            return {"found": True, "script": str(preds[0])}
+            return {"found": True, "script": str(preds[0]), "status": "inference"}
         return {"found": False}
     return {"found": False}
